@@ -1,26 +1,22 @@
-import os
 from flask import Flask, request, jsonify
 import pickle
+import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # ✅ Initialize Flask App
 app = Flask(__name__)
 
-# ✅ Adjust Path for `models/` Since `app.py` is Inside `backend/`
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Moves up one level from `backend/`
-models_dir = os.path.join(base_dir, 'models')  # Corrects the path
+# ✅ Add a homepage route to prevent 404 errors
+@app.route('/')
+def home():
+    return jsonify({"message": "Welcome to the AI Email Spam Detector API! Use the `/predict` endpoint to classify emails."})
 
+# ✅ Load Trained Model
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+models_dir = os.path.join(base_dir, 'models')
 spam_model_path = os.path.join(models_dir, 'spam_classifier.pkl')
 vectorizer_path = os.path.join(models_dir, 'vectorizer.pkl')
 
-# ✅ Check If Model Files Exist
-if not os.path.exists(spam_model_path):
-    raise FileNotFoundError(f"❌ Model file NOT found: {spam_model_path}")
-
-if not os.path.exists(vectorizer_path):
-    raise FileNotFoundError(f"❌ Vectorizer file NOT found: {vectorizer_path}")
-
-# ✅ Load Trained Model
 with open(spam_model_path, 'rb') as f:
     model = pickle.load(f)
 
@@ -47,4 +43,4 @@ def predict():
 
 # ✅ Run Flask App
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=10000, debug=True)
